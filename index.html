@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>AllService</title>
+    <style>
+      body {
+        background-color: #f0f0f0; /* เปลี่ยนสีพื้นหลัง */
+        color: #333;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      #pictureUrl {
+        width: 130px;
+        border-radius: 50%;
+      }
+
+      #btnLogout,
+      #btnSend {
+        background-color: #f44336;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 8px;
+      }
+      .wrap-text {
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div><img id="pictureUrl" /></div>
+    <p id="userId"><b>User Id : </b></p>
+    <p id="displayName"><b>Display Name : </b></p>
+    <p id="statusMessage"><b>Status Message : </b></p>
+    <p id="decodedIDToken"><b>Email : </b></p>
+    <!-- <p id="Bid"><b>Bid = </b></p> -->
+    <p id="CompanyId"><b>CompanyId : </b></p>
+    <p>
+      <strong>channelAccessToken:</strong>
+      <span class="wrap-text" id="channelAccessToken"></span>
+    </p>
+
+    <button id="btnLogout" onClick="logOut()">Logout</button>
+
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+    <script>
+      async function GetUserProfile() {
+        const profile = await liff.getProfile();
+        document.getElementById('pictureUrl').src = profile.pictureUrl;
+        document.getElementById('userId').append(profile.userId);
+        document.getElementById('statusMessage').append(profile.statusMessage);
+        document.getElementById('displayName').append(profile.displayName);
+        const channelAccessToken = sessionStorage.getItem('channelAccessToken');
+        const companyId = sessionStorage.getItem('companyId');
+        const userId = sessionStorage.getItem('userId');
+        // ตรวจสอบว่าค่ามีอยู่หรือไม่
+        if (channelAccessToken && companyId && userId) {
+          // นำค่าไปใช้งานตามต้องการ
+          document.getElementById('channelAccessToken').textContent =
+            channelAccessToken;
+          document.getElementById('CompanyId').textContent = companyId;
+          // เพิ่มการใช้งาน userId ตามต้องการ
+        }
+      }
+
+      async function main() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const channelAccessToken = urlParams.get('ChannelAccessToken');
+        const companyId = urlParams.get('CompanyID');
+        const userId = urlParams.get('userID');
+
+        // // บันทึกค่าใน sessionStorage
+        sessionStorage.setItem('channelAccessToken', channelAccessToken);
+        sessionStorage.setItem('companyId', companyId);
+        sessionStorage.setItem('userId', userId);
+        await liff.init({
+          liffId: '2000437027-rdpOxxy4',
+          withLoginOnExternalBrowser: true,
+        });
+        if (liff.isLoggedIn()) {
+          GetUserProfile();
+        } else {
+          const destinationurl = window.location.href;
+          liff.login();
+        }
+      }
+      main();
+
+      function logOut() {
+        liff.logout();
+        window.location.reload();
+      }
+    </script>
+  </body>
+</html>
