@@ -5,8 +5,8 @@
     <title>Allservice</title>
     <style>
       body {
-        background-color: #222;
-        color: #fff;
+        background-color: #f0f0f0; /* เปลี่ยนสีพื้นหลัง */
+        color: #333;
         font-family: Arial, sans-serif;
         display: flex;
         flex-direction: column;
@@ -35,20 +35,18 @@
         cursor: pointer;
         border-radius: 8px;
       }
-
       .wrap-text {
         white-space: pre-wrap;
       }
     </style>
   </head>
-
   <body>
     <div><img id="pictureUrl" /></div>
     <p id="userId"><b>User Id : </b></p>
     <p id="displayName"><b>Display Name : </b></p>
     <p id="statusMessage"><b>Status Message : </b></p>
     <p id="decodedIDToken"><b>Email : </b></p>
-    <p id="CompanyId"><b>CompanyID : </b></p>
+    <p id="CompanyId"><b>CompanyId : </b></p>
     <p>
       <strong>channelAccessToken:</strong>
       <span class="wrap-text" id="channelAccessToken"></span>
@@ -64,18 +62,29 @@
         document.getElementById('userId').append(profile.userId);
         document.getElementById('statusMessage').append(profile.statusMessage);
         document.getElementById('displayName').append(profile.displayName);
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const channelAccessToken = urlParams.get('channelAccessToken');
-        const CompanyId = urlParams.get('CompanyId');
-
-        // แสดงผลค่าพารามิเตอร์ที่ได้รับ
-        document.getElementById('channelAccessToken').textContent =
-          channelAccessToken;
-        document.getElementById('CompanyId').textContent = CompanyId;
+        const channelAccessToken = sessionStorage.getItem('channelAccessToken');
+        const companyId = sessionStorage.getItem('companyId');
+        const userId = sessionStorage.getItem('userId');
+        // ตรวจสอบว่าค่ามีอยู่หรือไม่
+        if (channelAccessToken && companyId && userId) {
+          // นำค่าไปใช้งานตามต้องการ
+          document.getElementById('channelAccessToken').textContent =
+            channelAccessToken;
+          document.getElementById('CompanyId').textContent = companyId;
+          // เพิ่มการใช้งาน userId ตามต้องการ
+        }
       }
 
       async function main() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const channelAccessToken = urlParams.get('ChannelAccessToken');
+        const companyId = urlParams.get('CompanyID');
+        const userId = urlParams.get('userID');
+
+        // // บันทึกค่าใน sessionStorage
+        sessionStorage.setItem('channelAccessToken', channelAccessToken);
+        sessionStorage.setItem('companyId', companyId);
+        sessionStorage.setItem('userId', userId);
         await liff.init({
           liffId: '2000437027-rdpOxxy4',
           withLoginOnExternalBrowser: true,
@@ -83,6 +92,7 @@
         if (liff.isLoggedIn()) {
           GetUserProfile();
         } else {
+          const destinationurl = window.location.href;
           liff.login();
         }
       }
