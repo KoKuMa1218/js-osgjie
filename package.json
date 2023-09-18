@@ -1,10 +1,8 @@
 {
   "name": "js",
   "version": "0.0.0",
-  "private": true,
+  "private": false,
   "dependencies": {
-    "@line/liff": "2.22.2",
-    "express": "^4.18.2",
-    "mssql": "^10.0.0"
+    "@line/liff": "2.22.2"
   }
 }
